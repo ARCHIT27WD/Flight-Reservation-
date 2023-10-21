@@ -1,0 +1,107 @@
+#include <iostream>
+#include <vector>
+#include <string>
+
+class Flight {
+public:
+    std::string flightNumber;
+    std::string departure;
+    std::string destination;
+    int totalSeats;
+    int availableSeats;
+
+    Flight(const std::string& number, const std::string& depart, const std::string& dest, int seats)
+        : flightNumber(number), departure(depart), destination(dest), totalSeats(seats), availableSeats(seats) {}
+};
+
+class Reservation {
+public:
+    std::string flightNumber;
+    std::string passengerName;
+    int seatNumber;
+
+    Reservation(const std::string& number, const std::string& name, int seat)
+        : flightNumber(number), passengerName(name), seatNumber(seat) {}
+};
+
+class FlightReservationSystem {
+private:
+    std::vector<Flight> flights;
+    std::vector<Reservation> reservations;
+
+public:
+    void addFlight(const Flight& flight) {
+        flights.push_back(flight);
+    }
+
+    void displayFlights() {
+        std::cout << "Available Flights:" << std::endl;
+        for (const Flight& flight : flights) {
+            std::cout << "Flight Number: " << flight.flightNumber << std::endl;
+            std::cout << "Departure: " << flight.departure << std::endl;
+            std::cout << "Destination: " << flight.destination << std::endl;
+            std::cout << "Available Seats: " << flight.availableSeats << " / " << flight.totalSeats << std::endl;
+            std::cout << "-----------------------------" << std::endl;
+        }
+    }
+
+    bool reserveSeat(const std::string& flightNumber, const std::string& passengerName, int seatNumber) {
+        for (Flight& flight : flights) {
+            if (flight.flightNumber == flightNumber && flight.availableSeats > 0) {
+                Reservation reservation(flightNumber, passengerName, seatNumber);
+                reservations.push_back(reservation);
+                flight.availableSeats--;
+                return true;
+            }
+        }
+        return false;
+    }
+};
+
+int main() {
+    FlightReservationSystem system;
+
+    // Add sample flights to the system.
+    system.addFlight(Flight("AA101", "New York", "Los Angeles", 100));
+    system.addFlight(Flight("UA202", "Chicago", "San Francisco", 120));
+
+    int choice;
+    do {
+        std::cout << "Flight Reservation System Menu:" << std::endl;
+        std::cout << "1. View Available Flights" << std::endl;
+        std::cout << "2. Make a Reservation" << std::endl;
+        std::cout << "3. Quit" << std::endl;
+        std::cout << "Enter your choice: ";
+        std::cin >> choice;
+
+        switch (choice) {
+            case 1:
+                system.displayFlights();
+                break;
+            case 2: {
+                std::string flightNumber, passengerName;
+                int seatNumber;
+                std::cout << "Enter Flight Number: ";
+                std::cin >> flightNumber;
+                std::cout << "Enter Passenger Name: ";
+                std::cin.ignore();
+                std::getline(std::cin, passengerName);
+                std::cout << "Enter Seat Number: ";
+                std::cin >> seatNumber;
+                if (system.reserveSeat(flightNumber, passengerName, seatNumber)) {
+                    std::cout << "Reservation successful." << std::endl;
+                } else {
+                    std::cout << "Reservation failed. The flight may be full or doesn't exist." << std::endl;
+                }
+                break;
+            }
+            case 3:
+                std::cout << "Goodbye!" << std::endl;
+                break;
+            default:
+                std::cout << "Invalid choice. Please try again." << std::endl;
+        }
+    } while (choice != 3);
+
+    return 0;
+}
